@@ -9,13 +9,11 @@ module Mockle
     def on_mockle_block(exp)
       @lvars = Set.new
       @gvars = Set.new
-      @current_gvars = Set.new
 
       inner = compile(exp)
       lvars = @lvars.map { |x| "_var_#{x}=" }.join
-      gvars = @gvars.map { |x| "_base_#{x}=" }.join
       [:multi,
-        [:code, "#{lvars}#{gvars} 0 if false"],
+        [:code, "#{lvars} 0 if false"],
         inner]
     end
 
@@ -34,12 +32,7 @@ module Mockle
     end
 
     def on_mockle_ctx(name)
-      if @current_gvars.include?(name)
-        "_base_#{name}"
-      else
-        @current_gvars << name
-        "(_base_#{name}=#{on_mockle_lctx(name)})"
-      end
+      on_mockle_lctx(name)
     end
 
     def on_mockle_dot(exp, name)
@@ -111,13 +104,7 @@ module Mockle
     end
 
     def reset(var)
-      case var[1]
-      when :lctx
-        @current_gvars.delete(var[2])
-      when :var
-      else
-        raise "Can't reset: #{var.inspect}"
-      end
+      # TODO: Implement funky fast stuff!
     end
   end
 end
