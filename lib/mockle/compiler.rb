@@ -8,7 +8,6 @@ module Mockle
 
     def on_mockle_block(exp)
       @lvars = Set.new
-      @gvars = Set.new
 
       inner = compile(exp)
       lvars = @lvars.map { |x| "_var_#{x}=" }.join
@@ -27,7 +26,6 @@ module Mockle
     end
 
     def on_mockle_lctx(name)
-      @gvars << name
       "ctx[#{name.to_sym.inspect}]"
     end
 
@@ -94,7 +92,6 @@ module Mockle
     end
 
     def on_mockle_for(var, collection, code)
-      reset(var)
       [:multi,
         [:code, "#{compile(collection)}.each do |e| #{compile(var)}=e"],
         compile(code),
@@ -102,12 +99,10 @@ module Mockle
     end
 
     def on_mockle_assign(var, expr)
-      reset(var)
       [:code, "#{compile(var)} = #{compile(expr)}"]
     end
 
     def on_mockle_capture(var, expr)
-      reset(var)
       [:multi,
         [:capture, "_cap", compile(expr)],
         [:code, "(#{compile(var)} ||= '') << _cap"]]
@@ -119,10 +114,6 @@ module Mockle
 
     def on_mockle_op(name, a, b)
       "(#{compile(a)} #{name} #{compile(b)})"
-    end
-
-    def reset(var)
-      # TODO: Implement funky fast stuff!
     end
   end
 end
