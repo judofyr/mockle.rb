@@ -37,16 +37,14 @@ rule
     : LPAREN assignment RPAREN opt_newline { result = val[1] }
     | IF LPAREN expression RPAREN opt_newline program ifclose
       { result = [:mockle, :if, val[2], val[5], val[6]] }
-    | FOR LPAREN local_ident IN expression RPAREN opt_newline program end_block
+    | FOR LPAREN lvalue IN expression RPAREN opt_newline program end_block
       {
         result = [:mockle, :for, val[2], val[4], val[7]]
       }
 
   assignment
-    : local_ident ASSIGN expression
+    : lvalue ASSIGN expression
       { result = [:mockle, :assign, val[0], val[2]] }
-    | DOLLAR IDENT ASSIGN expression
-      { result = [:mockle, :assign, [:mockle, :lctx, val[1]], val[3]] }
 
   ifclose
     : stmt_start ELSEIF LPAREN expression RPAREN opt_newline program ifclose
@@ -59,12 +57,13 @@ rule
     :
     | LPAREN RPAREN
 
-  local_ident
+  lvalue
     : IDENT
       {
         @locals[val[0]] = true
         result = [:mockle, :var, val[0]]
       }
+    | DOLLAR IDENT { result = [:mockle, :lctx, val[1]] }
 
   end_block
     : stmt_start END opt_newline
@@ -118,8 +117,7 @@ rule
     @lexer.next_token
   end
 
-  def on_error(*a)
-    p a
+  def on_error(t, val, vstack)
     p @lexer
     super
   end
