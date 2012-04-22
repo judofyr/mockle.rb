@@ -116,6 +116,10 @@ module Mockle
       "(#{compile(a)} #{name} #{compile(b)})"
     end
 
+    def on_mockle_concat(a, b)
+      '"#{%s}#{%s}"' % [compile(a), compile(b)]
+    end
+
     def on_mockle_num(n)
       n.to_i
     end

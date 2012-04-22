@@ -138,6 +138,10 @@ EOF
     def test_strings
       assert_equal "hello", execute("@('hello')")
     end
+
+    def test_concat
+      assert_equal "2aworld", execute("@(2 a 'world')", :a => 'a')
+    end
   end
 end
 
