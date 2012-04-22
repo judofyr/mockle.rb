@@ -4,6 +4,7 @@ token TEXT START LPAREN RPAREN STRING NUM IDENT DOT ADD SUB MUL DIV MOD SPACE DO
 
 prechigh
   left DOT
+  nonassoc LPAREN
   nonassoc NOT
   left MUL DIV MOD
   left ADD SUB
@@ -106,6 +107,15 @@ rule
     | expression INNERSPACE expression { result = [:mockle, :concat, val[0], val[2]] }
     | expression CMP expression { result = [:mockle, :op, val[1], val[0], val[2]] }
     | BANG expression =NOT  { result = [:mockle, :not, val[1]] }
+    | expression DOT IDENT { result = [:mockle, :dot, val[0], val[2]] }
+    | expression DOT NUM   { result = [:mockle, :dot, val[0], val[2].to_i] }
+    | expression DOT group { result = [:mockle, :dot, val[0], val[2]] }
+    | expression DOT IDENT LPAREN explist RPAREN { result = [:mockle, :call, val[0], val[2], val[4]] }
+
+  explist
+    : { result = [] }
+    | expression { result = [val[0]] }
+    | explist COMMA expression { result = val[0] << val[2] }
 
   group
     : LPAREN expression RPAREN { result = val[1] }
@@ -113,9 +123,6 @@ rule
   variable
     : IDENT { result = [:mockle, @locals[val[0]] ? :var : :ctx, val[0]] }
     | DOLLAR IDENT { result = [:mockle, :ctx, val[1]] }
-    | variable DOT IDENT { result = [:mockle, :dot, val[0], val[2]] }
-    | variable DOT NUM   { result = [:mockle, :dot, val[0], val[2].to_i] }
-    | variable DOT group { result = [:mockle, :dot, val[0], val[2]] }
 
   number
     : NUM { result = [:mockle, :num, val.first] }

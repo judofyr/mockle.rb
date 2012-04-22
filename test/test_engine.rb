@@ -130,6 +130,10 @@ EOF
 
       assert_equal "2 2 Hello World 2 2", execute("@a @b Hello @>world(a=1,b=1) @a @b", :a => 2, :b => 2)
     end
+
+    def test_call
+      assert_equal "ff", execute("@a.to_s(16)", :a => 0xff)
+    end
   end
 end
 

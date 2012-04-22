@@ -34,7 +34,6 @@ module Mockle
     end
 
     def on_mockle_dot(exp, name)
-      type = exp[1]
       base = "base = #{compile(exp)};"
 
       case name
@@ -67,6 +66,11 @@ module Mockle
         "(#{array_pre_check} && #{array_check}) ? #{array_run} : "\
         "(#{method_run} if #{method_check})"\
       ")"
+    end
+
+    def on_mockle_call(base, name, args)
+      arg = args.map { |x| compile(x) }.join(', ')
+      "base=#{compile(base)};(base.#{name}(#{arg}) if base.respond_to?(#{name.to_sym.inspect}))"
     end
 
     def on_mockle_partial(name, args)
