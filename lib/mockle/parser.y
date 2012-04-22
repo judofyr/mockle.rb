@@ -37,14 +37,12 @@ rule
     : LPAREN assignment RPAREN opt_newline { result = val[1] }
     | IF LPAREN expression RPAREN opt_newline program ifclose
       { result = [:mockle, :if, val[2], val[5], val[6]] }
+
     | FOR LPAREN lvalue IN expression RPAREN opt_newline program end_block
-      {
-        result = [:mockle, :for, val[2], val[4], val[7]]
-      }
+      { result = [:mockle, :for, val[2], val[4], val[7]] }
+
     | CAPTURE LPAREN lvalue RPAREN opt_newline program end_block
-      {
-        result = [:mockle, :capture, val[2], val[5]]
-      }
+      { result = [:mockle, :capture, val[2], val[5]] }
 
   assignment
     : lvalue ASSIGN expression
@@ -53,8 +51,10 @@ rule
   ifclose
     : stmt_start ELSEIF LPAREN expression RPAREN opt_newline program ifclose
       { result = [:mockle, :if, val[3], val[6], val[7]] }
+
     | stmt_start ELSE opt_parens opt_newline program end_block
       { result = val[4] }
+
     | end_block { result = nil }
 
   opt_parens
@@ -67,7 +67,8 @@ rule
         @locals[val[0]] = true
         result = [:mockle, :var, val[0]]
       }
-    | DOLLAR IDENT { result = [:mockle, :lctx, val[1]] }
+    | DOLLAR IDENT
+      { result = [:mockle, :lctx, val[1]] }
 
   end_block
     : stmt_start END opt_newline
