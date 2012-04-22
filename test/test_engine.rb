@@ -93,6 +93,25 @@ EOF
     def test_math
       assert_equal "7", execute("@(1+2*3-4/5%6)")
     end
+
+    def test_capture
+      res = execute <<-EOF, :a => 1
+@capture(b)
+Hello
+@end
+Between
+@capture(b)
+World
+@end
+@b
+EOF
+      assert_equal <<-EOF, res
+Between
+Hello
+World
+
+EOF
+    end
   end
 end
 

@@ -95,6 +95,13 @@ module Mockle
       [:code, "#{compile(var)} = #{compile(expr)}"]
     end
 
+    def on_mockle_capture(var, expr)
+      reset(var)
+      [:multi,
+        [:capture, "_cap", compile(expr)],
+        [:code, "(#{compile(var)} ||= '') << _cap"]]
+    end
+
     def on_mockle_num(n)
       n.to_i
     end

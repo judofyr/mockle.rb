@@ -53,7 +53,7 @@ module Mockle
     SYMRE = Regexp.union(CMP + SYMBOLS.keys)
     SPACE_SYMRE = /\s*(#{SYMRE})\s*/
 
-    KEYWORDS = /(#{Regexp.union(%w[if else elseif for end])})\b/
+    KEYWORDS = /(#{Regexp.union(%w[if else elseif for end capture])})\b/
 
     def scan_expr
       case

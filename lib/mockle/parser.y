@@ -1,6 +1,6 @@
 class Mockle::Parser
 
-token TEXT START LPAREN RPAREN STRING NUM IDENT DOT ADD SUB MUL DIV MOD SPACE DOLLAR ASSIGN CMP IF END FOR IN BANG ELSE ELSEIF NEWLINE INNERSPACE
+token TEXT START LPAREN RPAREN STRING NUM IDENT DOT ADD SUB MUL DIV MOD SPACE DOLLAR ASSIGN CMP IF END FOR IN BANG ELSE ELSEIF NEWLINE INNERSPACE CAPTURE
 
 prechigh
   left DOT
@@ -40,6 +40,10 @@ rule
     | FOR LPAREN lvalue IN expression RPAREN opt_newline program end_block
       {
         result = [:mockle, :for, val[2], val[4], val[7]]
+      }
+    | CAPTURE LPAREN lvalue RPAREN opt_newline program end_block
+      {
+        result = [:mockle, :capture, val[2], val[5]]
       }
 
   assignment
