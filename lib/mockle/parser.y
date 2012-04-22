@@ -1,6 +1,6 @@
 class Mockle::Parser
 
-token TEXT START LPAREN RPAREN STRING NUM IDENT DOT ADD SUB MUL DIV MOD SPACE DOLLAR ASSIGN CMP IF END FOR IN BANG ELSE ELSEIF NEWLINE INNERSPACE CAPTURE
+token TEXT START LPAREN RPAREN STRING NUM IDENT DOT ADD SUB MUL DIV MOD SPACE DOLLAR ASSIGN CMP IF END FOR IN BANG ELSE ELSEIF NEWLINE INNERSPACE CAPTURE PARTIAL COMMA
 
 prechigh
   left DOT
@@ -35,6 +35,13 @@ rule
 
   statement
     : LPAREN assignment RPAREN opt_newline { result = val[1] }
+    
+    | PARTIAL IDENT
+      { result = [:mockle, :partial, val[1], {}] }
+
+    | PARTIAL IDENT arglist
+      { result = [:mockle, :partial, val[1], val[2]] }
+
     | IF LPAREN expression RPAREN opt_newline program ifclose
       { result = [:mockle, :if, val[2], val[5], val[6]] }
 
@@ -47,6 +54,17 @@ rule
   assignment
     : lvalue ASSIGN expression
       { result = [:mockle, :assign, val[0], val[2]] }
+
+  arglist
+    : LPAREN arguments RPAREN { result = val[1] }
+  
+  arguments
+    : { result = {} }
+    | argument
+    | arguments COMMA argument { result.merge!(val[2]) }
+
+  argument
+    : IDENT ASSIGN expression { result = { val[0] => val[2] } }
 
   ifclose
     : stmt_start ELSEIF LPAREN expression RPAREN opt_newline program ifclose

@@ -71,6 +71,24 @@ module Mockle
       ")"
     end
 
+    def on_mockle_partial(name, args)
+      res = [:multi]
+
+      ctx      = args.keys.map { |x| on_mockle_lctx(x) }.join(", ")
+      preserve = args.keys.map { |x| "_partial_#{x}"   }.join(", ")
+      values = args.values.map { |x| compile(x)        }.join(", ")
+
+      if !args.empty?
+        res << [:code, "#{preserve} = #{ctx}"]
+        res << [:code, "#{ctx} = #{values}"]
+      end
+
+      res << [:dynamic, "render_partial(#{name.inspect}, ctx)"]
+      res << [:code, "#{ctx} = #{preserve}"] if !args.empty?
+
+      res
+    end
+
     def on_mockle_if(cond, true_branch, false_branch)
       [:if, compile(cond), compile(true_branch), (compile(false_branch) if false_branch)]
     end

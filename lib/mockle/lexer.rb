@@ -6,9 +6,11 @@ module Mockle
       @ss = StringScanner.new(str)
       @state = :text
       @level = 0
+      @queue = []
     end
 
     def next_token
+      return @queue.shift unless @queue.empty?
       return if @ss.eos?
       send("scan_#{@state}")
     end
@@ -45,7 +47,8 @@ module Mockle
       "/" => :DIV,
       "%" => :MOD,
       "=" => :ASSIGN,
-      "!" => :BANG
+      "!" => :BANG,
+      "," => :COMMA
     }
 
     CMP = %w[== != > < >= <=]
@@ -60,6 +63,12 @@ module Mockle
       when @ss.scan(/@@/)
         @state = :text
         [:TEXT, "@"]
+
+      when @ss.scan(/@>/)
+        @queue << [:PARTIAL, ">"]
+        @queue << [:IDENT, @ss.scan(/[\.\w\/#]+/)]
+        @state = :text unless @ss.check(/\(/)
+        [:START, "@"]
 
       when @ss.scan(/@/)
         [:START, "@"]

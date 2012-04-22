@@ -112,6 +112,24 @@ World
 
 EOF
     end
+
+    def test_partials
+      def render_partial(name, ctx)
+        raise name unless name == "world.html#nice"
+        "World"
+      end
+
+      assert_equal "Hello World!", execute("Hello @>world.html#nice!")
+
+      def render_partial(name, ctx)
+        raise name unless name == "world"
+        raise unless ctx[:a] == 1
+        raise unless ctx[:b] == 1
+        "World"
+      end
+
+      assert_equal "2 2 Hello World 2 2", execute("@a @b Hello @>world(a=1,b=1) @a @b", :a => 2, :b => 2)
+    end
   end
 end
 
