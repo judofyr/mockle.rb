@@ -112,12 +112,16 @@ module Mockle
         [:code, "(#{compile(var)} ||= '') << _cap"]]
     end
 
+    def on_mockle_op(name, a, b)
+      "(#{compile(a)} #{name} #{compile(b)})"
+    end
+
     def on_mockle_num(n)
       n.to_i
     end
 
-    def on_mockle_op(name, a, b)
-      "(#{compile(a)} #{name} #{compile(b)})"
+    def on_mockle_str(n)
+      n.inspect
     end
   end
 end

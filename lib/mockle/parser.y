@@ -99,6 +99,7 @@ rule
     : group
     | variable
     | number
+    | string
     | expression ADD expression { result = [:mockle, :op, val[1], val[0], val[2]] }
     | expression SUB expression { result = [:mockle, :op, val[1], val[0], val[2]] }
     | expression MUL expression { result = [:mockle, :op, val[1], val[0], val[2]] }
@@ -126,6 +127,9 @@ rule
 
   number
     : NUM { result = [:mockle, :num, val.first] }
+
+  string
+    : STRING { result = [:mockle, :str, val.first] }
 
 ---- header
   require 'mockle/lexer'

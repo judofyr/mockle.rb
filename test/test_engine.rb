@@ -134,6 +134,10 @@ EOF
     def test_call
       assert_equal "ff", execute("@a.to_s(16)", :a => 0xff)
     end
+
+    def test_strings
+      assert_equal "hello", execute("@('hello')")
+    end
   end
 end
 
