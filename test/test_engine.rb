@@ -123,8 +123,8 @@ EOF
 
       def render_partial(name, ctx)
         assert_equal "world", name
-        assert_equal 2, ctx[:a]
-        assert_equal 2, ctx[:b]
+        assert_equal 1, ctx[:a]
+        assert_equal 1, ctx[:b]
         "World"
       end
 
