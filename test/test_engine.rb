@@ -115,16 +115,16 @@ EOF
 
     def test_partials
       def render_partial(name, ctx)
-        raise name unless name == "world.html#nice"
+        assert_equal "world.html#nice", name
         "World"
       end
 
       assert_equal "Hello World!", execute("Hello @>world.html#nice!")
 
       def render_partial(name, ctx)
-        raise name unless name == "world"
-        raise unless ctx[:a] == 1
-        raise unless ctx[:b] == 1
+        assert_equal "world", name
+        assert_equal 2, ctx[:a]
+        assert_equal 2, ctx[:b]
         "World"
       end
 
