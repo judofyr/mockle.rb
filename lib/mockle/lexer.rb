@@ -66,7 +66,9 @@ module Mockle
 
       when @ss.scan(/@>/)
         @queue << [:PARTIAL, ">"]
-        @queue << [:IDENT, @ss.scan(/[\.\w\/#]+/)]
+        if s = @ss.scan(/[\.\w\/#]+/)
+          @queue << [:IDENT, s]
+        end
         @state = :text unless @ss.check(/\(/)
         [:START, "@"]
 

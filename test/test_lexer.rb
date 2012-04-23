@@ -194,6 +194,14 @@ EOF
       assert_equal [:TEXT, "Cool\n"], next_token
       assert_nil next_token
     end
+
+    def test_failing_partials
+      lex "@>>"
+      assert_equal [:START, "@"], next_token
+      assert_equal [:PARTIAL, ">"], next_token
+      assert_equal [:TEXT, ">"], next_token
+      assert_nil next_token
+    end
   end
 end
 
