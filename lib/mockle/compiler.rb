@@ -21,16 +21,15 @@ module Mockle
     end
 
     def on_mockle_var(name)
-      @lvars << name
-      "_var_#{name}"
-    end
-
-    def on_mockle_lctx(name)
-      "ctx[#{name.to_sym.inspect}]"
+      if @lvars.include?(name)
+        "_var_#{name}"
+      else
+        on_mockle_ctx(name)
+      end
     end
 
     def on_mockle_ctx(name)
-      on_mockle_lctx(name)
+      "ctx[#{name.to_sym.inspect}]"
     end
 
     def on_mockle_dot(exp, name)
@@ -76,9 +75,9 @@ module Mockle
     def on_mockle_partial(name, args)
       res = [:multi]
 
-      ctx      = args.keys.map { |x| on_mockle_lctx(x) }.join(", ")
-      preserve = args.keys.map { |x| "_partial_#{x}"   }.join(", ")
-      values = args.values.map { |x| compile(x)        }.join(", ")
+      ctx      = args.keys.map { |x| on_mockle_ctx(x) }.join(", ")
+      preserve = args.keys.map { |x| "_partial_#{x}"  }.join(", ")
+      values = args.values.map { |x| compile(x)       }.join(", ")
 
       if !args.empty?
         res << [:code, "#{preserve} = #{ctx}"]
@@ -96,6 +95,7 @@ module Mockle
     end
 
     def on_mockle_for(var, collection, code)
+      assign(var)
       [:multi,
         [:code, "#{compile(collection)}.each do |e| #{compile(var)}=e"],
         compile(code),
@@ -103,10 +103,12 @@ module Mockle
     end
 
     def on_mockle_assign(var, expr)
+      assign(var)
       [:code, "#{compile(var)} = #{compile(expr)}"]
     end
 
     def on_mockle_capture(var, expr)
+      assign(var)
       [:multi,
         [:capture, "_cap", compile(expr)],
         [:code, "(#{compile(var)} ||= '') << _cap"]]
@@ -126,6 +128,16 @@ module Mockle
 
     def on_mockle_str(n)
       n.inspect
+    end
+
+    def assign(var)
+      case var[1]
+      when :var
+        @lvars << var[2]
+      when :ctx
+      else
+        raise "Cannot assign: #{var.inspect}"
+      end
     end
   end
 end

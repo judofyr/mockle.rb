@@ -46,14 +46,14 @@ rule
     | IF LPAREN expression RPAREN opt_newline program ifclose
       { result = [:mockle, :if, val[2], val[5], val[6]] }
 
-    | FOR LPAREN lvalue IN expression RPAREN opt_newline program end_block
+    | FOR LPAREN variable IN expression RPAREN opt_newline program end_block
       { result = [:mockle, :for, val[2], val[4], val[7]] }
 
-    | CAPTURE LPAREN lvalue RPAREN opt_newline program end_block
+    | CAPTURE LPAREN variable RPAREN opt_newline program end_block
       { result = [:mockle, :capture, val[2], val[5]] }
 
   assignment
-    : lvalue ASSIGN expression
+    : variable ASSIGN expression
       { result = [:mockle, :assign, val[0], val[2]] }
 
   arglist
@@ -79,15 +79,6 @@ rule
   opt_parens
     :
     | LPAREN RPAREN
-
-  lvalue
-    : IDENT
-      {
-        @locals[val[0]] = true
-        result = [:mockle, :var, val[0]]
-      }
-    | DOLLAR IDENT
-      { result = [:mockle, :lctx, val[1]] }
 
   end_block
     : stmt_start END opt_newline
@@ -122,7 +113,7 @@ rule
     : LPAREN expression RPAREN { result = val[1] }
 
   variable
-    : IDENT { result = [:mockle, @locals[val[0]] ? :var : :ctx, val[0]] }
+    : IDENT { result = [:mockle, :var, val[0]] }
     | DOLLAR IDENT { result = [:mockle, :ctx, val[1]] }
 
   number
@@ -140,7 +131,6 @@ rule
   end
 
   def parse(str)
-    @locals = {}
     @lexer = Lexer.new(str)
     [:mockle, :block, do_parse]
   end

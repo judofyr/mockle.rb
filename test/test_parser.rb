@@ -32,7 +32,7 @@ module Mockle
     def test_var
       assert_equal [:multi,
         [:static, "Welcome "],
-        [:mockle, :output, [:mockle, :ctx, "name"]],
+        [:mockle, :output, [:mockle, :var, "name"]],
         [:static, "!"]
       ],
       parse("Welcome @name!")
@@ -41,7 +41,7 @@ module Mockle
     def test_var_child
       assert_equal [:multi,
         [:static, "Welcome "],
-        [:mockle, :output, [:mockle, :dot, [:mockle, :ctx, "user"], "name"]],
+        [:mockle, :output, [:mockle, :dot, [:mockle, :var, "user"], "name"]],
         [:static, "!"]
       ],
       parse("Welcome @user.name!")
@@ -51,7 +51,7 @@ module Mockle
       assert_equal [:multi,
         [:static, "Welcome "],
         [:mockle, :output,
-          [:mockle, :dot, [:mockle, :ctx, "user"], [:mockle, :ctx, "name"]]],
+          [:mockle, :dot, [:mockle, :var, "user"], [:mockle, :var, "name"]]],
         [:static, "!"]
       ],
       parse("Welcome @user.(name)!")
@@ -62,8 +62,8 @@ module Mockle
         [:static, "Welcome "],
         [:mockle, :output,
           [:mockle, :concat,
-            [:mockle, :ctx, "name"],
-            [:mockle, :ctx, "age"]]],
+            [:mockle, :var, "name"],
+            [:mockle, :var, "age"]]],
         [:static, "!"]
       ],
       parse("Welcome @(name age)!")
@@ -93,16 +93,16 @@ module Mockle
         [:mockle, :var, "content"],
         [:mockle, :op, "*",
           [:mockle, :num, "2"],
-          [:mockle, :ctx, "a"]
+          [:mockle, :var, "a"]
         ]
       ],
       parse("@(content=2*a)")
 
       assert_equal [:mockle, :assign,
-        [:mockle, :lctx, "content"],
+        [:mockle, :ctx, "content"],
         [:mockle, :op, "*",
           [:mockle, :num, "2"],
-          [:mockle, :ctx, "a"]
+          [:mockle, :var, "a"]
         ]
       ],
       parse("@($content=2*a)")
@@ -121,8 +121,8 @@ module Mockle
     def test_if
       assert_equal [:mockle, :if,
         [:mockle, :op, " == ",
-          [:mockle, :ctx, "a"],
-          [:mockle, :ctx, "b"]],
+          [:mockle, :var, "a"],
+          [:mockle, :var, "b"]],
         [:static, "hello"],
         nil
       ],
@@ -131,10 +131,10 @@ module Mockle
 
     def test_ifelse
       assert_equal [:mockle, :if,
-        [:mockle, :ctx, "a"],
+        [:mockle, :var, "a"],
         [:static, "a"],
         [:mockle, :if,
-          [:mockle, :ctx, "b"],
+          [:mockle, :var, "b"],
           [:static, "b"],
           [:static, "else"]]
       ],
@@ -144,7 +144,7 @@ module Mockle
     def test_for
       assert_equal [:mockle, :for,
         [:mockle, :var, "a"],
-        [:mockle, :ctx, "n"],
+        [:mockle, :var, "n"],
         [:multi,
           [:static, " hello "],
           [:mockle, :output, [:mockle, :var, "a"]],
@@ -157,7 +157,7 @@ module Mockle
     def test_not
       assert_equal [:mockle, :if,
         [:mockle, :not,
-          [:mockle, :ctx, "a"]],
+          [:mockle, :var, "a"]],
         [:static, "hello"],
         nil
       ],
