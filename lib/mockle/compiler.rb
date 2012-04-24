@@ -91,7 +91,7 @@ module Mockle
     end
 
     def on_mockle_if(cond, true_branch, false_branch)
-      [:if, compile(cond), compile(true_branch), (compile(false_branch) if false_branch)]
+      [:if, truthify(compile(cond)), compile(true_branch), (compile(false_branch) if false_branch)]
     end
 
     def on_mockle_for(var, collection, code)
@@ -138,6 +138,18 @@ module Mockle
       else
         raise "Cannot assign: #{var.inspect}"
       end
+    end
+
+    def truthify(code)
+      base = "t=#{code}"
+      empty_check = "t.respond_to?(:empty?)"
+      empty_run = "!t.empty?"
+
+      number_check = "t.is_a?(Fixnum)"
+      number_run = "t.nonzero?"
+      "(#{base}; t && ("\
+        "#{empty_check} ? #{empty_run} : "\
+        "#{number_check} ? #{number_run} : true))"
     end
   end
 end
