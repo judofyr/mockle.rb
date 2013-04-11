@@ -6,7 +6,7 @@ module Mockle
     def assert_lexes(str, tokens)
       res = []
       lexer = Lexer.new(str)
-      while token = lexer.lex
+      while token = lexer.next_token
         res << token
       end
       assert_equal tokens, res

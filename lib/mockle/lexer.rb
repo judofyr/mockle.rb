@@ -9,7 +9,7 @@ module Mockle
       @scope_stack = []
     end
 
-    def lex
+    def next_token
       return if @scanner.eos?
 
       self.class.lexers[@scope].each do |match, action|
@@ -59,7 +59,7 @@ module Mockle
 
     scope :default do
       lex('@@') { :ATCHAR }
-      lex('@') { push(:directive); lex }
+      lex('@') { push(:directive); next_token }
 
       # Swallow whitespace
       DIRECTIVES.each do |name|
@@ -81,12 +81,12 @@ module Mockle
       lex(/\w+/) { :IDENT }
       lex('.') { :DOT }
       lex('(') { push(:idirective); :LPAREN }
-      lex(/./) { pop; less; lex }
+      lex(/./) { pop; less; next_token }
     end
 
     scope :idirective do
       lex(' in ') { :IN }
-      lex(/\s+/) { lex }
+      lex(/\s+/) { next_token }
       lex(/\d+/) { :NUMBER }
       lex(/\w+/) { :IDENT }
       lex('.') { :DOT }
