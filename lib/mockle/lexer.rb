@@ -81,7 +81,7 @@ module Mockle
       lex(/\w+/) { :IDENT }
       lex('.') { :DOT }
       lex('(') { push(:idirective); :LPAREN }
-      lex(/./) { pop; less; next_token }
+      lex(/./m) { pop; less; next_token }
     end
 
     scope :idirective do

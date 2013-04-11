@@ -60,6 +60,13 @@ module Mockle
         [:RPAREN, ')'],
       ]
     end
+
+    def test_newlines
+      assert_lexes "@if\n", [
+        [:IF, 'if'],
+        [:TEXT, "\n"],
+      ]
+    end
   end
 end
 
