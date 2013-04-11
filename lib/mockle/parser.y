@@ -74,6 +74,8 @@ rule
   require 'ast'
 
 ---- inner
+  include AST::Sexp
+
   def initialize(options = {})
     super()
   end
@@ -85,10 +87,6 @@ rule
   
   alias call parse
 
-  def s(type, *children)
-    AST::Node.new(type, children)
-  end
-  
   def next_token
     @lexer.next_token
   end
