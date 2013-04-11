@@ -84,8 +84,6 @@ rule
     @lexer = Lexer.new(str)
     do_parse
   end
-  
-  alias call parse
 
   def next_token
     @lexer.next_token
@@ -96,11 +94,3 @@ rule
     super
   end
   
-  def combine(a, b)
-    a = [:multi, a] unless a[0] == :multi
-    if b[0] == :multi
-      a.concat(b[1..-1])
-    else
-      a << b
-    end
-  end
