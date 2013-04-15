@@ -71,13 +71,16 @@ rule
 
 ---- header
   require 'mockle/lexer'
-  require 'ast'
+  require 'mockle/node'
 
 ---- inner
-  include AST::Sexp
-
   def initialize(options = {})
     super()
+    @lineno = 1
+  end
+
+  def s(type, *children)
+    Mockle::Node.new(type, children, :lineno => @lineno)
   end
 
   def parse(str)
@@ -86,7 +89,11 @@ rule
   end
 
   def next_token
-    @lexer.next_token
+    token, (str, lineno) = @lexer.next_token
+    if token
+      @lineno = lineno 
+      [token, str]
+    end
   end
 
   def on_error(t, val, vstack)

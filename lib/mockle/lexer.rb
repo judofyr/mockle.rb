@@ -7,6 +7,7 @@ module Mockle
       @scanner = StringScanner.new(source)
       @scope = self.class.default_scope
       @scope_stack = []
+      @lineno = 1
     end
 
     def next_token
@@ -15,7 +16,8 @@ module Mockle
       self.class.lexers[@scope].each do |match, action|
         if str = @scanner.scan(match)
           res = instance_eval(&action)
-          res = [res, str] unless res.is_a?(Array)
+          res = [res, [str, @lineno]] unless res.is_a?(Array)
+          @lineno += str.count("\n")
           return res
         end
       end

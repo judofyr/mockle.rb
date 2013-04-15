@@ -7,7 +7,7 @@ module Mockle
       res = []
       lexer = Lexer.new(str)
       while token = lexer.next_token
-        res << token
+        res << [token[0], token[1][0]]
       end
       assert_equal tokens, res
     end
