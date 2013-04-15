@@ -30,7 +30,7 @@ module Mockle
 
     def test_variables
       assert_parses(
-        s(:contents,
+        s(:multi,
           s(:html, 'Hello '),
           s(:text, s(:lookup, 'world', nil)),
           s(:html, '!')),

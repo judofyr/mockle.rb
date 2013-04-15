@@ -10,10 +10,10 @@ rule
     : content
     | contents content
         {
-          result = if val[0].type == :contents
+          result = if val[0].type == :multi
             val[0].append(val[1])
           else
-            s(:contents, val[0], val[1])
+            s(:multi, val[0], val[1])
           end
         }
 
