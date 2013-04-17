@@ -14,7 +14,7 @@ module Mockle
 
     def eval_ast(ast)
       _buf = []
-      eval(@backend.compile(ast))
+      eval(@backend.compile(ast), binding, '(__TEMPLATE__)', 1)
       _buf
     end
 
@@ -54,9 +54,9 @@ module Mockle
         eval_ast(
           s(:multi,
             s(:text, 'Hello'),
-            s(:statement, 'raise').on_line(5)))
+            s(:statement, 'raise "hello"').on_line(5)))
       end
-      assert_match /^\(eval\):5:in/, err.message
+      assert_match /^\(__TEMPLATE__\):5:in/, err.backtrace[0]
     end
   end
 end
