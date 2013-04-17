@@ -9,8 +9,7 @@ module Mockle
     end
 
     def s(type, *children)
-      lineno = children.last.is_a?(Integer) ? children.pop : 1
-      Mockle::Node.new(type, children, :lineno => lineno)
+      Mockle::Node.new(type, children, :lineno => 1)
     end
 
     def eval_ast(ast)
@@ -55,7 +54,7 @@ module Mockle
         eval_ast(
           s(:multi,
             s(:text, 'Hello'),
-            s(:statement, 'raise', 5)))
+            s(:statement, 'raise').on_line(5)))
       end
       assert_match /^\(eval\):5:in/, err.message
     end

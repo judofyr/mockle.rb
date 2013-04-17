@@ -8,7 +8,7 @@ module Mockle
     end
 
     def s(*args)
-      @parser.s(*args, 1)
+      @parser.s(*args)
     end
 
     def assert_parses(exp, str)

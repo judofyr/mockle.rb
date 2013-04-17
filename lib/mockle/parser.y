@@ -13,29 +13,29 @@ rule
           result = if val[0].type == :multi
             val[0].append(val[1])
           else
-            s(:multi, val[0], val[1], val[0].lineno)
+            s(:multi, val[0], val[1]).on_line(val[0].lineno)
           end
         }
 
   content
-    : TEXT    { result = s(:html, value(val[0]), lineno(val[0])) }
-    | ATCHAR  { result = s(:html, value(val[0]), lineno(val[0])) }
-    | expr    { result = s(:text, val[0], val[0].lineno) }
+    : TEXT    { result = s(:html, value(val[0])).on_line(lineno(val[0])) }
+    | ATCHAR  { result = s(:html, value(val[0])).on_line(lineno(val[0])) }
+    | expr    { result = s(:text, val[0]).on_line(val[0].lineno) }
     | if   
     | for  
     | call 
 
   expr
     : IDENT
-        { result = s(:lookup, value(val[0]), nil, lineno(val[0])) }
+        { result = s(:lookup, value(val[0]), nil).on_line(lineno(val[0])) }
     | expr DOT IDENT
-        { result = s(:lookup, value(val[2]), val[0], lineno(val[1])) }
+        { result = s(:lookup, value(val[2]), val[0]).on_line(lineno(val[1])) }
     | NUMBER
-        { result = s(:number, value(val[0]), lineno(val[0])) }
+        { result = s(:number, value(val[0])).on_line(lineno(val[0])) }
 
   if
     : IF LPAREN expr RPAREN contents if_end
-        { result = s(:if, val[2], val[4], val[5], lineno(val[0])) }
+        { result = s(:if, val[2], val[4], val[5]).on_line(lineno(val[0])) }
 
   else
     : ELSE contents { result = val[1] }
@@ -45,11 +45,11 @@ rule
     : ENDIF { result = nil }
     | else ENDIF
     | ELSEIF LPAREN expr RPAREN contents if_end
-        { result = s(:if, val[2], val[4], val[5], lineno(val[0])) }
+        { result = s(:if, val[2], val[4], val[5]).on_line(lineno(val[0])) }
 
   for
     : FOR LPAREN IDENT IN expr RPAREN contents for_end
-        { result = s(:for, val[2], val[4], val[6], val[7], lineno(val[0])) }
+        { result = s(:for, val[2], val[4], val[6], val[7]).on_line(lineno(val[0])) }
 
   for_end
     : ENDFOR { result = nil }
@@ -57,13 +57,13 @@ rule
 
   call
     : CALL LPAREN CNAME arglist RPAREN
-        { result = s(:call, val[2], val[3], lineno(val[0])) }
+        { result = s(:call, val[2], val[3]).on_line(lineno(val[0])) }
     | CALL LPAREN CNAME RPAREN
-        { result = s(:call, val[2], [], lineno(val[0])) }
+        { result = s(:call, val[2], []).on_line(lineno(val[0])) }
 
   arg
-    : COMMA expr { result = s(:argsplat, val[1], val[1].lineno) }
-    | COMMA IDENT EQ expr { result = s(:arg, value(val[1]), val[3], lineno(val[1])) }
+    : COMMA expr { result = s(:argsplat, val[1]).on_line(val[1].lineno) }
+    | COMMA IDENT EQ expr { result = s(:arg, value(val[1]), val[3]).on_line(lineno(val[1])) }
 
   arglist
     : arg         { result = val[0] }
@@ -78,8 +78,8 @@ rule
     super()
   end
 
-  def s(type, *children, lineno)
-    Mockle::Node.new(type, children, :lineno => lineno)
+  def s(type, *children)
+    Mockle::Node.new(type, children)
   end
 
   def value(token)
