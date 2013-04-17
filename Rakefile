@@ -1,6 +1,6 @@
 require 'rake/testtask'
 
-task :default => :test
+task :default => [:generate, :test]
 
 Rake::TestTask.new do |t|
   t.libs << 'test'
